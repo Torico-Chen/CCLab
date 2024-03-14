@@ -1,5 +1,8 @@
 body {
-    background-color: black;
+    background-color: #000000;
+    background-image: url('https://www.vangoghgallery.com/img/starry_night_full.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
     color: aliceblue;
     font-family: 'Courier New', Courier, monospace;
     font-size: 1em;
@@ -20,8 +23,7 @@ body {
 /* main content */
 #main-wrapper {
     width: 800px;
-    position: relative;
-    margin: auto;
+    margin: 50px auto;
 }
 
 .red {
@@ -35,7 +37,6 @@ body {
 .yellow {
     color: gold;
 }
-
 
 .two-columns {
     display: flex;
@@ -51,7 +52,6 @@ body {
     padding: 0px 0px 0px 10px;
 }
 
-
 #footer {
     text-align: center;
     font-size: 0.7em;
@@ -63,7 +63,6 @@ body {
 #p5-canvas-container img {
     width: 800px;
 }
-
 
 /* home button */
 #home-button a {

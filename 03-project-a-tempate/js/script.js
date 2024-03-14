@@ -19,11 +19,18 @@ let ymetspeed = 5;
 let pathX2 = new Array(PATHLEN);
 let pathY2 = new Array(PATHLEN);
 
+let creatureX = 0;
+let creatureY = 0;
+
 let meteorX = 177;
 let meteorY = 25;
+let isAngry = false;
 
-// let creatureX = 0,
-//   creatureY = 0;
+let tbh = 0;
+
+let scl = 1.0;
+let sclReduction = 0.01;
+let initialScl = 1
 
 
 function pVertex(r, theta) {
@@ -43,8 +50,10 @@ function starburst(x, y, r1, r2, theta, n) {
 }
 
 function setup() {
-    let canvas = createCanvas(800, 500);
-    canvas.parent("p5-canvas-container")
+    let cnv = createCanvas(800, 500);
+    cnv.parent("p5-canvas-container")
+    console.log("hello")
+
     canvas.addEventListener("mousedown", () => {
         isDrawing = true;
 
@@ -67,12 +76,14 @@ function setup() {
     }
 }
 
+
 function draw() {
     if (mouseIsPressed) {
         background(0, 10);
     } else {
         background(0, 50);
     }
+    //bg stars
     for (let i = 0; i < stars.length; i++) {
         let star = stars[i];
         fill(255, star.opacity);
@@ -83,15 +94,69 @@ function draw() {
         }
     }
 
-    if (keyIsPressed && key == "m") {
+    if (isAngry == true) {
+        //change mode
         angry();
+        //blackhole
+        push();
+        // blendMode(BLEND);
+        blendMode(ADD);
+        noFill();
+        let nTriangles = 500;
+        translate(mouseX, mouseY);
+        for (let i = nTriangles; i > 0; i--) {
+            push();
+            if (i % 3 === 0) {
+                stroke(100, 0, 0, 255 * (1 - i / nTriangles));
+            } else if (i % 3 === 1) {
+                stroke(0, 100, 0, 255 * (1 - i / nTriangles));
+            } else {
+                stroke(0, 0, 100, 255 * (1 - i / nTriangles));
+            }
+            let angle = (-i / nTriangles) * TWO_PI + radians(tbh);
+            rotate(angle);
+            drawTriangle(i / 2.5);
+            pop();
+        }
+        tbh += 1;
+        pop();
     } else {
         normall();
     }
 
+    //blackhole
+    function drawTriangle(size) {
+        let h1 = size / (2 * cos(radians(30)));
+        let h2 = h1 * sin(radians(30));
+        triangle(0, -h1, -size / 2, h2, size / 2, h2);
+    }
     if (!isDrawing) {
         return;
     }
+
+    push();
+    if (blendModeAdd) {
+        blendMode(ADD);
+    } else {
+        blendMode(BLEND);
+    }
+
+    //generate stars
+    push()
+    //shrink
+    translate(mouseX, mouseY); // move the origin to the center
+
+    if (isAngry == true) {
+        scl -= sclReduction;
+        if (scl < 0) {
+            scl = 0;
+        }
+        scale(scl);
+    } else {
+        scl = initialScl; // Reset scale value when isAngry is false
+    }
+
+    translate(-mouseX, -mouseY); // put it back!
     for (let i = 0; i < meteors.length; i++) {
         let meteor = meteors[i];
         // let t = millis();
@@ -116,17 +181,12 @@ function draw() {
             fill(r2, g2, b2);
             let j = (i + k + 1) % PATHLEN;
             let theta = sin((4 * (t - j)) / TWO_PI) * PI;
-            starburst(pathX[j], pathY[j], 20, 10, theta, 8);
+            starburst(pathX[j], pathY[j], 20, 10, theta, 7);
         }
     }
 
-    push();
-    if (blendModeAdd) {
-        blendMode(ADD);
-    } else {
-        blendMode(BLEND);
-    }
-
+    pop()
+    //star trail
     t += 0.0005;
     let X = noise(t) * width;
     let Y = noise(t * 0.009) * height;
@@ -141,18 +201,29 @@ function draw() {
     pop();
 }
 
+//switch off
 function keyPressed() {
     if (key === "s") {
         blendModeAdd = !blendModeAdd;
+    } else if (key == " ") {
+        isAngry = !isAngry; // toggle
+        if (isAngry == true) {
+            pathX2 = []; // empty the array: empty the path
+            pathY2 = [];
+            meteorX = creatureX; // set the position of the meteor
+            meteorY = creatureY;
+        }
     }
 }
 
+//normal version
 function normall() {
     push();
-    creatureX = sin(frameCount * 0.008) * 150 + 150 + moveX;
-    creatureY = cos(frameCount * 0.01) * 200 + 250 + moveY;
+    let offsetX = sin(frameCount * 0.008) * 150 + 150 + moveX;
+    let offsetY = cos(frameCount * 0.01) * 200 + 250 + moveY;
 
-    translate(creatureX, creatureY);
+    translate(offsetX, offsetY);
+
     let numLines = 6;
     for (let i = 0; i < numLines; i++) {
         let diameter = map(i, 0, numLines - 1, 70, 10);
@@ -161,33 +232,40 @@ function normall() {
         let b = map(i, 0, numLines - 1, 50, 0);
         fill(r, g, b);
 
-        for (let x = -sin(frameCount * 0.008) * 180; x < 180; x += 5) {
+        for (let x = -sin(frameCount * 0.008) * 180; x <= 180; x += 5) {
             let y =
                 sin(frameCount * 0.08 + map(x, -200, 100, 0, 2 * PI)) *
                 sin(frameCount * 0.01) *
                 50 +
                 random(0, sin(frameCount * 0.01) * 5);
             circle(x, y, diameter);
+            creatureY = offsetY + y;
         }
     }
     pop();
+
+    creatureX = offsetX + 180;
 }
 
-
+//angry version
 function angry() {
     push();
-    translate(creatureX, creatureY);
+    if (blendModeAdd) {
+        blendMode(ADD);
+    } else {
+        blendMode(BLEND);
+    }
     let t = millis();
     let k = frameCount % PATHLEN2;
     pathX2[k] = meteorX;
     pathY2[k] = meteorY;
     meteorX = meteorX + xmetspeed;
     meteorY = meteorY + ymetspeed;
-    if (meteorX < -creatureX || meteorX > width - creatureX) {
+    if (meteorX < 0 || meteorX > width) {
         xmetspeed *= -1;
     }
 
-    if (meteorY < -creatureY || meteorY > height - creatureY) {
+    if (meteorY < 0 || meteorY > height) {
         ymetspeed *= -1;
     }
 
@@ -205,4 +283,3 @@ function angry() {
     }
     pop();
 }
-
