@@ -1,0 +1,50 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  display: block;
+}
+
+h1 {
+  text-align: center;
+}
+
+#mainflex {
+  /*spesific div to change*/
+  background-color: aquamarine;
+  display: flex;
+  /*?*/
+  width: 100%;
+  max-width: 1000px;
+  margin: auto;
+  /*in centre*/
+
+  flex-direction: row;
+
+
+}
+
+
+@media (max-width: 800px) {
+
+  /* CSS rules */
+  #mainflex {
+    flex-direction: column;
+    max-width: 500px;
+  }
+
+  .intro {
+    order: 2
+  }
+
+  #p5-canvas-container {
+    order: 1
+  }
+
+  .credits {
+    order: 3
+  }
+}
