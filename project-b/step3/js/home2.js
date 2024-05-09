@@ -121,7 +121,7 @@ function draw() {
     }
 
     if (fireStartSound.isPlaying() && fireStartSound.currentTime() >= 5 && count === 0) {
-      encoreSound.play()
+      //encoreSound.play()
       encoreSound.loop()
       if (!buttonVisible) {
         buttonContainer.style.display = 'block';
