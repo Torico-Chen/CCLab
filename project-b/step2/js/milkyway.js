@@ -106,8 +106,10 @@ function draw() {
 
       }
     }
+    console.log(asteroids.length, addedAsteroids, maxAsteroids);
 
-    if (asteroids.length === 0 && addedAsteroids >= maxAsteroids) {
+    if (asteroids.length <= 2 && addedAsteroids >= maxAsteroids) {
+      console.log(gameover);
       gameover = true;
       textSize(12);
       text('You Win!', spaceship.pos.x, spaceship.pos.y + 50);
