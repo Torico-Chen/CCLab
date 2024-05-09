@@ -13,6 +13,7 @@ let transitionProgress = 0; // control the transition progress
 let rainSound;
 let fireStartSound;
 let encoreSound;
+let buttonVisible = false;
 
 let stars = [];
 const starsNum = 30;
@@ -59,6 +60,7 @@ function setup() {
 }
 
 function draw() {
+  const buttonContainer = document.getElementById('buttonContainer');
   background(0);
 
   // Start the timer
@@ -121,10 +123,16 @@ function draw() {
     if (fireStartSound.isPlaying() && fireStartSound.currentTime() >= 5 && count === 0) {
       encoreSound.play()
       encoreSound.loop()
+      if (!buttonVisible) {
+        buttonContainer.style.display = 'block';
+        buttonVisible = true;
+      }
+
       for (let i = 0; i < starsNum; i++) {
         stars.push(new Star());
       }
       count++;
+
     }
 
     for (let i = 0; i < formsNum; i++) {
