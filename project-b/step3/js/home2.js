@@ -119,8 +119,8 @@ function draw() {
         fireStartSound.play();
       }// Increase the transition progress gradually
     }
-
-    if (fireStartSound.isPlaying() && fireStartSound.currentTime() >= 5 && count === 0) {
+    //console.log(fireStartSound.currentTime(), count);
+    if (fireStartSound.isPlaying() && fireStartSound.currentTime() >= 5) {
       //encoreSound.play()
       encoreSound.loop()
       if (!buttonVisible) {
