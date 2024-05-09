@@ -77,6 +77,13 @@ h1 {
 	display: none;
 }
 
+#buttonnContainer {
+	position: absolute;
+	top: 530px;
+	left: 1310px;
+	display: none;
+}
+
 .button {
 	background-color: #ffffff;
 	color: rgb(129, 129, 129);

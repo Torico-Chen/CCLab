@@ -3,6 +3,7 @@ let asteroidImg;
 let backgroundImg;
 let explosionImg;
 let buttonVisible = false;
+let buttonnVisible = false;
 
 let spaceship;
 let asteroids = [];
@@ -40,6 +41,7 @@ function setup() {
 
 function draw() {
   const buttonContainer = document.getElementById('buttonContainer');
+  const buttonnContainer = document.getElementById('buttonnContainer');
   clear();
 
   push();
@@ -97,118 +99,122 @@ function draw() {
 
       textSize(12);
       text('Game Over', spaceship.pos.x, spaceship.pos.y + 50);
+      if (!buttonnVisible) {
+        buttonnContainer.style.display = 'block';
+        buttonnVisible = true;
+        noLoop();
+
+      }
+    }
+
+    if (asteroids.length === 0 && addedAsteroids >= maxAsteroids) {
+      gameover = true;
+      textSize(12);
+      text('You Win!', spaceship.pos.x, spaceship.pos.y + 50);
+      if (!buttonVisible) {
+        buttonContainer.style.display = 'block';
+        buttonVisible = true;
+      }
       noLoop();
     }
-  }
 
-  if (asteroids.length === 0 && addedAsteroids >= maxAsteroids) {
-    gameover = true;
+    if (!gameover) {
+      // Calculate
+      elapsedTime = floor((millis() - startTime) / 1000);
+    }
+    //timer
     textSize(12);
-    text('You Win!', spaceship.pos.x, spaceship.pos.y + 50);
-    if (!buttonVisible) {
-      buttonContainer.style.display = 'block';
-      buttonVisible = true;
-    }
-    noLoop();
-  }
-
-  if (!gameover) {
-    // Calculate
-    elapsedTime = floor((millis() - startTime) / 1000);
-  }
-  //timer
-  textSize(12);
-  textAlign(CENTER, CENTER);
-  text('Time: ' + elapsedTime, width / 2, height - 50);
-  fill(0, 102, 153);
-}
-
-
-function mousePressed() {
-  if (mouseButton === LEFT) {
-    laserSound.play();
-    lasers.push(new Laser(createVector(spaceship.pos.x, spaceship.pos.y), spaceship.angle));
-
-  }
-}
-
-class Spaceship {
-  constructor() {
-    this.pos = createVector(width / 2, height / 2);
-    this.angle = 0;
-  }
-
-  show() {
-    push();
-    translate(this.pos.x, this.pos.y);
-    rotate(this.angle);
-    imageMode(CENTER);
-    image(spaceshipImg, 0, 0, spaceshipImg.width / 4, spaceshipImg.height / 4);
-    pop();
-  }
-
-  rotate() {
-    let mouseVec = createVector(mouseX - this.pos.x, mouseY - this.pos.y);
-    this.angle = mouseVec.heading();
+    textAlign(CENTER, CENTER);
+    text('Time: ' + elapsedTime, width / 2, height - 50);
+    fill(0, 102, 153);
   }
 
 
-  hits(asteroid) {
-    let d = dist(this.pos.x, this.pos.y, asteroid.pos.x, asteroid.pos.y);
-    return d < (spaceshipImg.width / 2 + asteroidImg.width / 2) / 4 - 50;
-  }
-}
+  function mousePressed() {
+    if (mouseButton === LEFT) {
+      laserSound.play();
+      lasers.push(new Laser(createVector(spaceship.pos.x, spaceship.pos.y), spaceship.angle));
 
-class Asteroid {
-  constructor() {
-    let edge = floor(random(4));
-    let x = random(width);
-    let y = random(height);
-    if (edge === 0) {
-      y = 0;
-    } else if (edge === 1) {
-      x = width;
-    } else if (edge === 2) {
-      y = height;
-    } else if (edge === 3) {
-      x = 0;
-    }
-    this.pos = createVector(x, y);
-    this.vel = p5.Vector.sub(createVector(width / 2, height / 2), this.pos).setMag(random(0.5, 2));
-    this.show = function () {
-      imageMode(CENTER);
-      image(asteroidImg, this.pos.x, this.pos.y, asteroidImg.width / 4, asteroidImg.height / 4);
-    };
-    this.move = function () {
-      this.pos.add(this.vel);
-    };
-    this.show = function () {
-      imageMode(CENTER);
-      image(asteroidImg, this.pos.x, this.pos.y, asteroidImg.width / 8, asteroidImg.height / 8);
     }
   }
-}
 
-class Laser {
-  constructor(shipPos, angle) {
-    this.pos = createVector(shipPos.x, shipPos.y);
-    this.vel = p5.Vector.fromAngle(angle).mult(laserSpeed);
-    this.show = function () {
+  class Spaceship {
+    constructor() {
+      this.pos = createVector(width / 2, height / 2);
+      this.angle = 0;
+    }
+
+    show() {
       push();
-      stroke(255);
-      strokeWeight(5);
-      line(this.pos.x, this.pos.y, this.pos.x - this.vel.x, this.pos.y - this.vel.y); //laser beam
+      translate(this.pos.x, this.pos.y);
+      rotate(this.angle);
+      imageMode(CENTER);
+      image(spaceshipImg, 0, 0, spaceshipImg.width / 4, spaceshipImg.height / 4);
       pop();
-    };
-    this.move = function () {
-      this.pos.add(this.vel);
-    };
-    this.hits = function (asteroid) {
+    }
+
+    rotate() {
+      let mouseVec = createVector(mouseX - this.pos.x, mouseY - this.pos.y);
+      this.angle = mouseVec.heading();
+    }
+
+
+    hits(asteroid) {
       let d = dist(this.pos.x, this.pos.y, asteroid.pos.x, asteroid.pos.y);
-      return d < asteroidImg.width / 2 / 4;
-    };
-    this.offscreen = function () {
-      return this.pos.x < 0 || this.pos.x > width || this.pos.y < 0 || this.pos.y > height;
-    };
+      return d < (spaceshipImg.width / 2 + asteroidImg.width / 2) / 4 - 50;
+    }
   }
-}
+
+  class Asteroid {
+    constructor() {
+      let edge = floor(random(4));
+      let x = random(width);
+      let y = random(height);
+      if (edge === 0) {
+        y = 0;
+      } else if (edge === 1) {
+        x = width;
+      } else if (edge === 2) {
+        y = height;
+      } else if (edge === 3) {
+        x = 0;
+      }
+      this.pos = createVector(x, y);
+      this.vel = p5.Vector.sub(createVector(width / 2, height / 2), this.pos).setMag(random(0.5, 2));
+      this.show = function () {
+        imageMode(CENTER);
+        image(asteroidImg, this.pos.x, this.pos.y, asteroidImg.width / 4, asteroidImg.height / 4);
+      };
+      this.move = function () {
+        this.pos.add(this.vel);
+      };
+      this.show = function () {
+        imageMode(CENTER);
+        image(asteroidImg, this.pos.x, this.pos.y, asteroidImg.width / 8, asteroidImg.height / 8);
+      }
+    }
+  }
+
+  class Laser {
+    constructor(shipPos, angle) {
+      this.pos = createVector(shipPos.x, shipPos.y);
+      this.vel = p5.Vector.fromAngle(angle).mult(laserSpeed);
+      this.show = function () {
+        push();
+        stroke(255);
+        strokeWeight(5);
+        line(this.pos.x, this.pos.y, this.pos.x - this.vel.x, this.pos.y - this.vel.y); //laser beam
+        pop();
+      };
+      this.move = function () {
+        this.pos.add(this.vel);
+      };
+      this.hits = function (asteroid) {
+        let d = dist(this.pos.x, this.pos.y, asteroid.pos.x, asteroid.pos.y);
+        return d < asteroidImg.width / 2 / 4;
+      };
+      this.offscreen = function () {
+        return this.pos.x < 0 || this.pos.x > width || this.pos.y < 0 || this.pos.y > height;
+      };
+    }
+  }
